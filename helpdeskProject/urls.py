@@ -17,9 +17,29 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', RedirectView.as_view(url='/helpdesk', permanent = True))
+    path('helpdesk/', include('helpdesk.urls', namespace='helpdesk')),
+    path('', RedirectView.as_view(url='/accounts/login', permanent = True)),
+
+    path(
+        "password/change/",
+        auth_views.PasswordChangeView.as_view(
+            template_name="registration/password_change_form.html",
+            success_url="/password/change/done/"
+        ),
+        name="password_change",
+    ),
+
+    # Widok potwierdzenia zmiany hasła
+    path(
+        "password/change/done/",
+        auth_views.PasswordChangeDoneView.as_view(
+            template_name="registration/password_change_done.html",
+        ),
+        name="password_change_done",
+    ),
 ]
