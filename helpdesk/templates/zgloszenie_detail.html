@@ -26,8 +26,33 @@
             <hr>
 
             <p><strong>Zgłoszone przez:</strong> {{ zgloszenie.zgloszone_przez.username }}</p>
+
+            <p><strong>Przypisane do:</strong>
+                {% if zgloszenie.przypisane_do %}
+                    {{ zgloszenie.przypisane_do.username }}
+                {% else %}
+                    Brak (nieprzypisane)
+                {% endif %}
+            </p>
+
             <p><strong>Data utworzenia:</strong> {{ zgloszenie.data_utworzenia }}</p>
             <p><strong>Ostatnia aktualizacja:</strong> {{ zgloszenie.data_aktualizacji }}</p>
+
+            {% if is_manager %}
+                <hr>
+                <div class="bg-light p-3 border rounded">
+                    <strong>Panel Managera IT:</strong> Zmień przypisanie
+
+                    <form method="post" action="{% url 'helpdesk:zgloszenie_przypisz' zgloszenie.pk %}" class="mt-2">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 align-items-center">
+                            {{ form_przypisania.przypisane_do }}
+                            <button type="submit" class="btn btn-sm btn-success">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 
