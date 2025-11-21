@@ -13,5 +13,5 @@ urlpatterns = [
     # Widok szczegołów danego zgłoszenia, np. /helpdesk/zgloszenie/5 (
     path('zgloszenie/<int:pk>/', views.ZgloszenieDetailView.as_view(), name='zgloszenie_detail'),
     path('zgloszenie/<int:pk>/przypisz/', views.ZgloszeniePrzypiszView.as_view(), name='zgloszenie_przypisz'),
-    #
+    path('zgloszenie/<int:pk>/status/', views.ZgloszenieStatusView.as_view(), name='zgloszenie_status'),
 ]

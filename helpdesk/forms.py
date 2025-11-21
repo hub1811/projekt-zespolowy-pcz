@@ -42,3 +42,15 @@ class PrzypiszZgloszenieForm(forms.ModelForm):
             self.fields['przypisane_do'].queryset = User.objects.filter(groups=grupa_it)
         except Group.DoesNotExist:
             self.fields['przypisane_do'].queryset = User.objects.none()
+
+
+class ZmienStatusForm(forms.ModelForm):
+    class Meta:
+        model = Zgloszenie
+        fields = ['status']
+        labels = {
+            'status': 'Zmień status zgłoszenia'
+        }
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'})
+        }
