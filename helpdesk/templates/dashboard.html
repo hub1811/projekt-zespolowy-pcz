@@ -14,9 +14,16 @@
     <h1 class="text-center mb-4">HELPDESK</h1>
 
     <!-- GÓRNE PRZYCISKI -->
-    <div class="text-center mb-4">
+    <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
         <a href="{% url 'password_change' %}" class="btn btn-primary me-2">Zmień hasło</a>
         <a href="{% url 'helpdesk:zgloszenie_nowe' %}" class="btn btn-success">Nowe zgłoszenie</a>
+        {% if is_manager or user.is_superuser %}
+            <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Panel Admina</a>
+        {% endif %}
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Wyloguj</button>
+        </form>
     </div>
 
     <!-- KAFELKI ZE STATYSTYKAMI STATUSÓW -->

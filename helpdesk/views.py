@@ -21,48 +21,79 @@ class DashboardView(LoginRequiredMixin, View):
 
         user = request.user
 
-        # === 1. LOGIKA UPRAWNIEŃ (POPRAWIONE NAZWY GRUP) ===
+        # === 1. LOGIKA UPRAWNIEŃ ===
+        # Najpierw ustalamy, CO użytkownik może widzieć
         is_manager = user.groups.filter(name='IT Manager').exists()
         is_pracownik_it = user.groups.filter(name='Pracownik IT').exists()
 
-        # Domyślny queryset (pusty, zostanie nadpisany)
+        # Bazowy QuerySet (pusty)
         zgloszenia_qs = Zgloszenie.objects.none()
 
         if is_manager:
-            # IT Manager widzi wszystko
+            # Manager widzi wszystko
             zgloszenia_qs = Zgloszenie.objects.all()
         elif is_pracownik_it:
             # Pracownik IT widzi przypisane do siebie
             zgloszenia_qs = Zgloszenie.objects.filter(przypisane_do=user)
         else:
-            # "Użytkownik" (i każdy inny) widzi tylko swoje
+            # Zwykły użytkownik widzi tylko swoje
             zgloszenia_qs = Zgloszenie.objects.filter(zgloszone_przez=user)
 
-        # === 2. FILTROWANIE (bez zmian) ===
-        if status_filter:
-            zgloszenia_qs = zgloszenia_qs.filter(status=status_filter)
-        if kategoria_filter:
-            zgloszenia_qs = zgloszenia_qs.filter(kategoria=kategoria_filter)
+        # === 2. STATYSTYKI (PRZENIESIONE TUTAJ) ===
+        # Obliczamy statystyki NA BAZIE przefiltrowanej listy (zgloszenia_qs),
+        # a nie wszystkich obiektów w bazie.
 
-        zgloszenia_qs = zgloszenia_qs.order_by("-id")
+        # Całkowita liczba zgłoszeń (dla tego użytkownika)
+        total_count = zgloszenia_qs.count()
 
-        # === 3. STATYSTYKI (bez zmian) ===
-        status_counts = Zgloszenie.objects.values("status").annotate(count=Count("pk"))
+        # Zliczanie po statusach
+        status_counts = zgloszenia_qs.values("status").annotate(count=Count("pk"))
         count_map = {row["status"]: row["count"] for row in status_counts}
 
+        # Definicja kafelków
         status_cards = [
-            {"code": "NOWE", "label": "Status NOWE", "count": count_map.get("NOWE", 0)},
-            {"code": "W_TOKU", "label": "Status W toku", "count": count_map.get("W_TOKU", 0)},
-            {"code": "ROZWIAZANE", "label": "Status Rozwiazane", "count": count_map.get("ROZWIAZANE", 0)},
+            {
+                "label": "Nowe",
+                "count": count_map.get("NOWE", 0),
+                "color": "primary"  # Opcjonalnie do kolorowania
+            },
+            {
+                "label": "W toku",
+                "count": count_map.get("W_TOKU", 0),
+                "color": "warning"
+            },
+            {
+                "label": "Rozwiązane",
+                "count": count_map.get("ROZWIAZANE", 0),  # Pamiętaj o dokładnej nazwie statusu z bazy!
+                "color": "success"
+            },
         ]
 
+        # === 3. FILTROWANIE LISTY (Dla tabeli na dole) ===
+        # Filtrowanie po parametrach z paska adresu (np. ?status=NOWE)
+        # robimy DOPIERO PO obliczeniu statystyk, żeby kafelki zawsze pokazywały
+        # ogólny stan konta użytkownika, a nie zmieniały się po kliknięciu w filtr.
+
+        zgloszenia_do_wyswietlenia = zgloszenia_qs
+
+        if status_filter:
+            zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.filter(status=status_filter)
+        if kategoria_filter:
+            zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.filter(kategoria=kategoria_filter)
+
+        zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.order_by("-id")
+
         context = {
-            "zgloszenia": zgloszenia_qs,
+            # Do tabeli przekazujemy listę po dodatkowych filtrach
+            "zgloszenia": zgloszenia_do_wyswietlenia,
+
+            # Do kafelków i licznika przekazujemy dane sprzed filtrów statusu/kategorii
             "status_cards": status_cards,
+            "total_count": total_count,
+
             "status_filter": status_filter,
             "kategoria_filter": kategoria_filter,
-            "total_count": zgloszenia_qs.count(),  # Lepiej liczyć przefiltrowane
-            "is_manager": is_manager,  # Przekazujemy info o roli do template
+            "is_manager": is_manager,
         }
         return render(request, "dashboard.html", context)
 
