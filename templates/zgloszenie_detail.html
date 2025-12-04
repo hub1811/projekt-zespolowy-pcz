@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Zgłoszenie #{{ zgloszenie.id }}{% endblock %}
+{% block nav_tickets_active %}is-active{% endblock %}
+
+{% block breadcrumb %}
+    <li>Helpdesk</li>
+    <li>Zgłoszenia</li>
+    <li>#{{ zgloszenie.id }}</li>
+{% endblock %}
+
+{% block header_title %}Zgłoszenie #{{ zgloszenie.id }}{% endblock %}
+{% block header_subtitle %}{{ zgloszenie.temat }}{% endblock %}
+
+{% block header_actions %}
+    <button class="header-action">Historia</button>
+    <button class="header-action header-action-primary">Odpowiedz</button>
+{% endblock %}
+
+{% block main_column %}
+    <!-- tutaj wstawiasz swoje istniejące HTML z wątkiem zgłoszenia,
+         wykorzystując klasy .msg, .msg-bubble itd. -->
+{% endblock %}
+
+{% block side_column %}
+    <!-- prawa kolumna – pola z modelu zgloszenie -->
+    <div class="side-header">
+        <div class="side-header-title">Szczegóły zgłoszenia</div>
+    </div>
+    <div class="side-section">
+        <div class="side-label">Klient</div>
+        <div class="side-value">
+            {{ zgloszenie.zgloszone_przez.username }}
+        </div>
+    </div>
+    <div class="side-section">
+        <div class="side-label">Status</div>
+        <div class="side-badge">
+            <span class="side-badge-dot"></span>
+            <span>{{ zgloszenie.status }}</span>
+        </div>
+    </div>
+    <div class="side-section">
+        <div class="side-label">Priorytet</div>
+        <div class="side-value">{{ zgloszenie.priorytet }}</div>
+    </div>
+{% endblock %}

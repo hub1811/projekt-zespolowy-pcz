@@ -1,169 +1,154 @@
-<!doctype html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>HELPDESK – Dashboard</title>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-</head>
+{% extends "base.html" %}
 
-<body class="bg-light py-5">
+{% block title %}HELPDESK – Dashboard{% endblock %}
+{% block nav_dashboard_active %}is-active{% endblock %}
 
-<div class="container">
+{% block breadcrumb %}
+    <li>Helpdesk</li>
+    <li>Dashboard</li>
+{% endblock %}
 
-    <h1 class="text-center mb-4">HELPDESK</h1>
+{% block header_title %}Lista zgłoszeń{% endblock %}
+{% block header_subtitle %}Przegląd i filtrowanie zgłoszeń{% endblock %}
 
-    <!-- GÓRNE PRZYCISKI -->
-    <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
-        <a href="{% url 'password_change' %}" class="btn btn-primary me-2">Zmień hasło</a>
-        <a href="{% url 'helpdesk:zgloszenie_nowe' %}" class="btn btn-success">Nowe zgłoszenie</a>
-        {% if is_manager or user.is_superuser %}
-            <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Panel Admina</a>
-        {% endif %}
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-danger btn-sm">Wyloguj</button>
-        </form>
+{% block header_actions %}
+    <a href="{% url 'password_change' %}" class="header-action">Zmień hasło</a>
+    {% if is_manager or user.is_superuser %}
+        <a href="{% url 'admin:index' %}" class="header-action">Panel admina</a>
+    {% endif %}
+    <a href="{% url 'helpdesk:zgloszenie_nowe' %}" class="header-action header-action-primary">
+        Nowe zgłoszenie
+    </a>
+{% endblock %}
+
+{% block main_column %}
+    <div class="column-main-header">
+        Zgłoszenia
     </div>
+    <div class="column-main-body">
 
-    <!-- KAFELKI ZE STATYSTYKAMI STATUSÓW -->
-<div class="row row-cols-4 g-3 mb-4">
-    <!-- wszystkie zgłoszenia -->
-    <div class="col">
-        <div class="card text-center shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="text-muted mb-1">Wszystkie zgłoszenia</h6>
-                <h3 class="mb-0">{{ total_count }}</h3>
+        <!-- KAFELKI ZE STATYSTYKAMI STATUSÓW -->
+        <div class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+            <div class="col">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <h6 class="text-muted mb-1">Wszystkie zgłoszenia</h6>
+                        <h3 class="mb-0">{{ total_count }}</h3>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 3 statusy: NOWE, W toku, Zakończone -->
-    {% for s in status_cards %}
-        <div class="col">
-            <div class="card text-center shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <h6 class="text-muted mb-1">{{ s.label }}</h6>
-                    <h3 class="mb-0">{{ s.count }}</h3>
+            {% for s in status_cards %}
+                <div class="col">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h6 class="text-muted mb-1">{{ s.label }}</h6>
+                            <h3 class="mb-0">{{ s.count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- FILTRY -->
+        <form method="get" class="card mb-4 shadow-sm">
+            <div class="card-body d-flex justify-content-center align-items-end gap-3 flex-wrap">
+                <div class="col-md-4">
+                    <label class="form-label mb-1">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Wszystkie</option>
+                        <option value="NOWE" {% if status_filter == "NOWE" %}selected{% endif %}>NOWE</option>
+                        <option value="W_TOKU" {% if status_filter == "W_TOKU" %}selected{% endif %}>W toku</option>
+                        <option value="ROZWIAZANE"
+                                {% if status_filter == "ROZWIAZANE" %}selected{% endif %}>
+                            Rozwiązane
+                        </option>
+                        <option value="ZAMKNIETE"
+                                {% if status_filter == "ZAMKNIETE" %}selected{% endif %}>
+                            Zamknięte
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label mb-1">Kategoria</label>
+                    <select name="kategoria" class="form-select">
+                        <option value="">Wszystkie</option>
+                        {% for value, label in zgloszenia.model.KATEGORIE_ZGLOSZEN %}
+                            <option value="{{ value }}"
+                                    {% if kategoria_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-outline-primary">Filtruj</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- TABELA -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="mb-3">Lista zgłoszeń</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Tytuł</th>
+                            <th>Kategoria zgłoszenia</th>
+                            <th>Status</th>
+                            <th>Priorytet</th>
+                            <th>Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for zgl in zgloszenia %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'helpdesk:zgloszenie_detail' zgl.id %}">
+                                        #{{ zgl.id }}
+                                    </a>
+                                </td>
+                                <td>{{ zgl.tytul }}</td>
+                                <td>{{ zgl.get_kategoria_display }}</td>
+                                <td>{{ zgl.get_status_display }}</td>
+                                <td>{{ zgl.get_priorytet_display }}</td>
+                                <td>{{ zgl.data_utworzenia|date:"d F Y H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-3">
+                                    Brak zgłoszeń spełniających kryteria.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    {% endfor %}
-</div>
 
-
-
-    <!-- FILTRY -->
-    <form method="get" class="card mb-4 shadow-sm">
-        <div class="card-body d-flex justify-content-center align-items-end gap-3 flex-wrap">
-
-            <!-- FILTR STATUSU -->
-            <div class="col-md-4">
-                <label class="form-label mb-1">Status</label>
-                <select name="status" class="form-select">
-    <option value="">Wszystkie</option>
-
-    <option value="NOWE"
-            {% if status_filter == "NOWE" %}selected{% endif %}>
-        NOWE
-    </option>
-
-    <option value="W_TOKU"
-            {% if status_filter == "W_TOKU" %}selected{% endif %}>
-        W toku
-    </option>
-
-    <option value="ROZWIAZANE"
-            {% if status_filter == "Rozwiazane" %}selected{% endif %}>
-        Rozwiazane
-    </option>
-</select>
-
-            </div>
-
-            <!-- FILTR KATEGORII -->
-<div class="col-md-4">
-    <label class="form-label mb-1">Kategoria</label>
-    <select name="kategoria" class="form-select">
-        <option value="">Wszystkie</option>
-
-        <option value="1"
-                {% if kategoria_filter|stringformat:'s' == "1" %}selected{% endif %}>
-            Infrastruktura sieciowa
-        </option>
-
-        <option value="2"
-                {% if kategoria_filter|stringformat:'s' == "2" %}selected{% endif %}>
-            Oprogramowanie
-        </option>
-
-        <option value="3"
-                {% if kategoria_filter|stringformat:'s' == "3" %}selected{% endif %}>
-            Sprzęt komputerowy
-        </option>
-    </select>
-</div>
-
-
-            <!-- PRZYCISKI -->
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-outline-primary w-100">Filtruj</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- TABELA ZGŁOSZEŃ -->
-    <h2 class="mb-3">Lista zgłoszeń</h2>
-
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-striped mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tytuł</th>
-                        <th>Kategoria zgłoszenia</th>
-                        <th>Status</th>
-                        <th>Priorytet</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for z in zgloszenia %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'helpdesk:zgloszenie_detail' z.pk %}">
-                                #{{ z.id }}
-                            </a>
-                        </td>
-                        <td>{{ z.tytul }}</td>
-                        <td>{{ z.kategoria }}</td>  {# u Ciebie to już wypisuje pełną nazwę #}
-                        {# jeśli kiedyś zmienisz na choices, można użyć {{ z.get_kategoria_display }} #}
-<td>
-    {% if z.status == "W_TOKU" %}
-        W toku
-    {% elif z.status == "ROZWIAZANE" %}
-        Rozwiazane
-    {% else %}
-        {{ z.status|title }}
-    {% endif %}
-</td>
-                        <td>{{ z.priorytet }}</td>
-                        <td>{{ z.data_utworzenia }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-3">
-                            Brak zgłoszeń spełniających kryteria.
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
     </div>
+{% endblock %}
 
-</div>
-
-</body>
-</html>
+{% block side_column %}
+    <div class="column-side-header">
+        Szybkie statystyki
+    </div>
+    <div class="column-side-body">
+        <p class="mb-1"><strong>Łącznie zgłoszeń:</strong> {{ total_count }}</p>
+        <hr>
+        <ul class="list-unstyled mb-0">
+            {% for s in status_cards %}
+                <li class="d-flex justify-content-between align-items-center mb-1">
+                    <span>{{ s.label }}</span>
+                    <span class="badge bg-secondary">{{ s.count }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

@@ -1,10 +1,860 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<!doctype html>
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block title %}Panel zgłoszeń{% endblock %}</title>
+
+    <!-- Bootstrap (opcjonalnie – możesz usunąć, jeśli nie używasz) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+   <style>
+        :root {
+            --sidebar-bg: #151b26;
+            --sidebar-bg-active: #111822;
+            --sidebar-text: #c7cbd5;
+            --sidebar-text-active: #ffffff;
+            --border-subtle: #e3e7ed;
+            --border-strong: #c4cad6;
+            --page-bg: #f5f7fb;
+            --content-bg: #ffffff;
+            --accent: #2f80ed;
+            --accent-soft: #e3efff;
+            --danger: #e5494d;
+            --radius-lg: 12px;
+            --radius-xl: 18px;
+            --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        /* DARK MODE – nadpisanie zmiennych i kolorów */
+        :root[data-theme='dark'] {
+            --sidebar-bg: #0f0f15;
+            --sidebar-bg-active: #14141d;
+            --sidebar-text: #b0b6c3;
+            --sidebar-text-active: #ffffff;
+
+            --page-bg: #0d0d12;
+            --content-bg: #1b1b23;
+
+            --border-subtle: #2a2a33;
+            --border-strong: #3a3a44;
+            --accent: #4c8dff;
+            --accent-soft: #233356;
+            --danger: #f97373;
+        }
+
+        /* Ogólne tło i teksty */
+        :root[data-theme='dark'] body {
+            background: var(--page-bg);
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .app-header {
+            background: var(--content-bg);
+            border-color: var(--border-subtle);
+        }
+
+        :root[data-theme='dark'] .column-main,
+        :root[data-theme='dark'] .column-side {
+            background: var(--content-bg);
+            border-color: var(--border-subtle);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .6);
+        }
+
+        /* Nagłówki paneli */
+        :root[data-theme='dark'] .column-main-header,
+        :root[data-theme='dark'] .column-main-footer,
+        :root[data-theme='dark'] .side-header {
+            background: #24242c;
+            border-color: var(--border-subtle);
+            color: #ffffff;
+        }
+
+        /* Karty */
+        :root[data-theme='dark'] .card {
+            background-color: var(--content-bg);
+            border-color: var(--border-subtle);
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .card-header,
+        :root[data-theme='dark'] .card-body {
+            background-color: var(--content-bg);
+            border-color: var(--border-subtle);
+        }
+
+        /* Tabele */
+        :root[data-theme='dark'] .table {
+            color: #e5e7eb;
+            background-color: var(--content-bg);
+        }
+
+        :root[data-theme='dark'] .table th {
+            background-color: #24242c !important;
+            color: #ffffff !important;
+        }
+
+        :root[data-theme='dark'] .table-light th {
+            background-color: #24242c !important;
+            color: #ffffff !important;
+        }
+
+        :root[data-theme='dark'] .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: #1f1f27 !important;
+        }
+
+        :root[data-theme='dark'] .table-striped > tbody > tr:nth-of-type(even) > * {
+            background-color: #181820 !important;
+        }
+
+        :root[data-theme='dark'] .table-hover > tbody > tr:hover > * {
+            background-color: #2c2c36 !important;
+        }
+
+        /* FORMULARZE */
+        :root[data-theme='dark'] .form-select,
+        :root[data-theme='dark'] .form-control {
+            background-color: #1a1a22;
+            border-color: #2e2e39;
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .form-select:focus,
+        :root[data-theme='dark'] .form-control:focus {
+            box-shadow: none;
+            border-color: #4c8dff;
+            background-color: #1a1a22;
+            color: #ffffff;
+        }
+
+        /* PRZYCISKI */
+        :root[data-theme='dark'] .header-action,
+        :root[data-theme='dark'] .btn {
+            background-color: #1f1f28;
+            border-color: #2e2e36;
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .header-action:hover,
+        :root[data-theme='dark'] .btn:hover {
+            background-color: #2a2a33;
+            border-color: #3a3a44;
+        }
+
+        :root[data-theme='dark'] .header-action-primary,
+        :root[data-theme='dark'] .btn-primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        /* TAGI */
+        :root[data-theme='dark'] .side-badge {
+            background: #24242c;
+            border-color: var(--border-subtle);
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .side-tag {
+            background: #24242c;
+            border-color: var(--border-subtle);
+            color: #e5e7eb;
+        }
+
+        /* WIADOMOŚCI */
+        :root[data-theme='dark'] .msg-bubble {
+            background: #202030;
+            border-color: #33334a;
+        }
+
+        :root[data-theme='dark'] .msg-staff .msg-bubble {
+            background: #181820;
+            border-color: #33334a;
+        }
+
+        :root[data-theme='dark'] .text-editor {
+            border-color: #33334a;
+            background: #181820;
+            color: #e5e7eb;
+        }
+
+        /* --------------------------------------------- */
+        /* 🔥 Wymuszone jasne kolory tekstu tabeli w DARK MODE */
+        /* --------------------------------------------- */
+        :root[data-theme='dark'] table,
+        :root[data-theme='dark'] table td,
+        :root[data-theme='dark'] table th {
+            color: #e5e7eb !important;
+        }
+
+        :root[data-theme='dark'] table a {
+            color: #82aaff !important;
+        }
+
+        :root[data-theme='dark'] table a:hover {
+            color: #b4cdff !important;
+            text-decoration: underline;
+        }
+
+        /* ------------------------------------------------ */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+    margin: 0;
+    padding: 20px;     /* 🌟 miękkie marginesy od krawędzi ekranu */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--page-bg);
+    color: #1f2933;
+}
+
+
+        .app-shell {
+    min-height: calc(100vh - 40px); /* kompensuje padding body */
+    background: var(--page-bg);     /* aby marginesy były w tym samym kolorze */
+    display: flex;
+}
+
+
+        /* LEWE MENU ------------------------------------------------------ */
+        .app-sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            gap: 10px;
+        }
+
+        .sidebar-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ffb545, #ff5f6d);
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .sidebar-subtitle {
+            font-size: 11px;
+            color: #8c93a7;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            padding: 18px 20px 8px;
+            color: #6f7688;
+        }
+
+        .sidebar-nav {
+            padding: 0 8px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .sidebar-item {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+        }
+
+        .sidebar-link.is-active {
+            background: var(--sidebar-bg-active);
+            color: var(--sidebar-text-active);
+        }
+
+        .sidebar-link .icon-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #4b5563;
+        }
+
+        .sidebar-link.is-active .icon-dot {
+            background: var(--accent);
+        }
+
+        .sidebar-pill {
+            margin-top: auto;
+            padding: 16px 16px 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 999px;
+            padding: 6px 8px 6px 6px;
+        }
+
+        .sidebar-user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: #374151;
+            overflow: hidden;
+        }
+
+        .avatar-sm img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sidebar-user-name {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .sidebar-user-role {
+            font-size: 11px;
+            color: #9ca3b3;
+        }
+
+        .sidebar-user-actions button {
+            border: none;
+            background: transparent;
+            color: #9ca3b3;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* PRAWA CZĘŚĆ ---------------------------------------------------- */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: #ffffff;
+        }
+
+        .app-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .breadcrumb {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            gap: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: #9ca3af;
+        }
+
+        .breadcrumb li + li:before {
+            content: "/";
+            margin-right: 6px;
+            color: #c4cad6;
+        }
+
+        .ticket-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .ticket-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .app-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-action {
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: #ffffff;
+            padding: 6px 12px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .header-action-primary {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        .header-action-danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* GŁÓWNY OBSZAR TREŚCI ------------------------------------------- */
+        .app-content {
+            flex: 1;
+            padding: 18px 18px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-columns {
+            height: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(290px, 0.9fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 992px) {
+            .app-columns {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .column-main,
+        .column-side {
+            background: var(--content-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .column-main-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fbfcff;
+        }
+
+        .column-main-body {
+            flex: 1;
+            padding: 16px 18px 10px;
+            overflow-y: auto;
+        }
+
+        .column-main-footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 10px 14px;
+            background: #fbfcff;
+        }
+
+        /* Wiadomości w wątku -------------------------------------------- */
+        .msg {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #e5e7eb;
+        }
+
+        .msg-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .msg-bubble {
+            background: #f3f4ff;
+            border-radius: 14px;
+            padding: 10px 12px;
+            max-width: 100%;
+            border: 1px solid #e0e4ff;
+        }
+
+        .msg-meta {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .msg-text {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .msg-staff .msg-bubble {
+            background: #ffffff;
+            border-color: var(--border-subtle);
+        }
+
+        .text-editor {
+            border-radius: 10px;
+            border: 1px dashed #e5e7eb;
+            padding: 6px 10px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* PRAWY PANEL – szczegóły zgłoszenia ---------------------------- */
+        .side-header {
+            padding: 14px 18px 10px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: #fbfcff;
+        }
+
+        .side-header-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .side-section {
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .side-section:last-child {
+            border-bottom: none;
+        }
+
+        .side-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            margin-bottom: 4px;
+            color: #6b7280;
+        }
+
+        .side-value {
+            font-size: 13px;
+        }
+
+        .side-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 2px 10px;
+            border: 1px solid var(--border-subtle);
+            background: #f9fafb;
+            gap: 6px;
+        }
+
+        .side-badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #10b981;
+        }
+
+        .side-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .side-tag {
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 2px 8px;
+            background: #f3f4ff;
+            border: 1px solid #e0e4ff;
+        }
+        /* Naprawa: statystyki w dark mode (tekst nagłówków był zbyt ciemny) */
+:root[data-theme='dark'] .column-main-header,
+:root[data-theme='dark'] .column-main-header * {
+    color: #e5e7eb !important;
+}
+
+/* Jeżeli statystyki są w osobnych .card — nadpisujemy też to: */
+:root[data-theme='dark'] .card,
+:root[data-theme='dark'] .card * {
+    color: #e5e7eb !important;
+}
+
+    </style>
+
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
+
+<div class="app-shell">
+
+    <!-- LEWY PANEL / NAWIGACJA -->
+    <aside class="app-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"></div>
+            <div>
+                <div class="sidebar-title">Helpdesk</div>
+                <div class="sidebar-subtitle">Obsługa zgłoszeń</div>
+            </div>
+        </div>
+
+        <div class="sidebar-section-label">Nawigacja</div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{% url 'helpdesk:dashboard' %}"
+                   class="sidebar-link {% block nav_dashboard_active %}{% endblock %}">
+                    <span class="icon-dot"></span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{% url 'helpdesk:dashboard' %}"
+   class="sidebar-link {% block nav_tickets_active %}{% endblock %}">
+
+                    <span class="icon-dot"></span>
+                    <span>Zgłoszenia</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#"
+                   class="sidebar-link {% block nav_knowledge_active %}{% endblock %}">
+                    <span class="icon-dot"></span>
+                    <span>Baza wiedzy</span>
+                </a>
+            </li>
+            {% block nav_extra %}{% endblock %}
+        </ul>
+
+        <div class="sidebar-pill">
+            <div class="sidebar-user">
+                <div class="sidebar-user-info">
+                    <div class="avatar-sm">
+                        <!-- Możesz tu wstawić gravatar/zdjęcie -->
+                    </div>
+                    <div>
+                        <div class="sidebar-user-name">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </div>
+                        <div class="sidebar-user-role">
+                            {% if request.user.is_superuser %}Administrator{% else %}Agent{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-user-actions">
+                    <button title="Wyloguj"
+                            onclick="document.getElementById('logout-form').submit()">⏏</button>
+                </div>
+            </div>
+            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </aside>
+
+    <!-- PRAWA CZĘŚĆ – GŁÓWNA ZAWARTOŚĆ -->
+    <div class="app-main">
+
+        <!-- GÓRNY PASEK -->
+        <header class="app-header">
+            <div class="app-header-left">
+                <div>
+                    <ul class="breadcrumb">
+                        {% block breadcrumb %}
+                        <li>DASHBOARD</li>
+                        {% endblock %}
+                    </ul>
+
+                    <div class="ticket-title">
+                        {% block header_title %}Panel{% endblock %}
+                    </div>
+                    <div class="ticket-subtitle">
+                        {% block header_subtitle %}Zarządzanie zgłoszeniami i modułami systemu{% endblock %}
+                    </div>
+                </div>
+            </div>
+           <div class="header-actions">
+    <!-- PRZEŁĄCZNIK DARK MODE -->
+    <button id="theme-toggle" type="button" class="header-action">
+        🌙 Ciemny motyw
+    </button>
+
+    {% block header_actions %}
+        <a href="{% url 'password_change' %}" class="header-action">Zmień hasło</a>
+        <a href="{% url 'helpdesk:zgloszenie_nowe' %}"
+           class="header-action header-action-primary">Nowe zgłoszenie</a>
+    {% endblock %}
+</div>
+
+        </header>
+
+        <!-- OBSZAR ROBOCZY – DWA PANELE JAK NA ZRZUCIE -->
+        <main class="app-content">
+            <div class="app-columns">
+                <section class="column-main">
+                    {% block main_column %}
+                    <!-- domyślna treść – wątek zgłoszenia -->
+                    <div class="column-main-header">
+                        <div>
+                            <strong>Zgłoszenie #123456</strong><br>
+                            <span style="font-size: 12px; color:#6b7280;">Od: Jan Kowalski • 20.08.2023</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="header-action">Odpowiedz</button>
+                            <button class="header-action header-action-danger">Zamknij</button>
+                        </div>
+                    </div>
+                    <div class="column-main-body">
+                        <div class="msg">
+                            <div class="msg-avatar"></div>
+                            <div class="msg-bubble">
+                                <div class="msg-meta">Jan Kowalski • 20.08.2023, 14:32</div>
+                                <div class="msg-text">
+                                    Dzień dobry, proszę o wysyłkę zamówienia na adres firmowy...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="msg msg-staff">
+                            <div class="msg-avatar"></div>
+                            <div class="msg-bubble">
+                                <div class="msg-meta">Agent • 21.08.2023, 09:12</div>
+                                <div class="msg-text">
+                                    Dziękujemy za wiadomość. Przesyłka została przygotowana do wysyłki...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column-main-footer">
+                        <div class="text-editor">
+                            Kliknij, aby dodać odpowiedź… (tu możesz podpiąć formularz / edytor WYSIWYG)
+                        </div>
+                    </div>
+                    {% endblock %}
+                </section>
+
+                <aside class="column-side">
+                    {% block side_column %}
+                    <div class="side-header">
+                        <div class="side-header-title">Szczegóły zgłoszenia</div>
+                    </div>
+
+                    <div class="side-section">
+                        <div class="side-label">Klient</div>
+                        <div class="side-value">Jan Kowalski<br>jan.kowalski@example.com</div>
+                    </div>
+
+                    <div class="side-section">
+                        <div class="side-label">Status</div>
+                        <div class="side-badge">
+                            <span class="side-badge-dot"></span>
+                            <span>Oczekuje na odpowiedź</span>
+                        </div>
+                    </div>
+
+                    <div class="side-section">
+                        <div class="side-label">Priorytet</div>
+                        <div class="side-value">Normalny</div>
+                    </div>
+
+                    <div class="side-section">
+                        <div class="side-label">Tagi</div>
+                        <div class="side-tag-list">
+                            <span class="side-tag">order</span>
+                            <span class="side-tag">kopi susu</span>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </aside>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap JS (opcjonalnie) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    const STORAGE_KEY = 'helpdesk-theme';
+    const root = document.documentElement;
+    let currentTheme = 'light';
+    let toggleBtn = null;
+
+    function applyTheme(theme) {
+        currentTheme = theme;
+        root.setAttribute('data-theme', theme);
+        if (toggleBtn) {
+            toggleBtn.textContent = theme === 'dark'
+                ? '☀ Jasny motyw'
+                : '🌙 Ciemny motyw';
+        }
+    }
+
+    // --- Ustal motyw przy starcie ---
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+
+    window.addEventListener('DOMContentLoaded', function () {
+        toggleBtn = document.getElementById('theme-toggle');
+        if (!toggleBtn) return;
+
+        // Ustaw etykietę przycisku
+        applyTheme(currentTheme);
+
+        // --- Najważniejsze: poprawna logika przełączania ---
+        toggleBtn.addEventListener('click', function () {
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            localStorage.setItem(STORAGE_KEY, nextTheme);
+        });
+    });
+})();
+</script>
+
 
 </body>
 </html>
