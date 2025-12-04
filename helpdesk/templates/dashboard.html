@@ -1,16 +1,6 @@
 {% extends "base.html" %}
-
-{% block title %}HELPDESK – Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 {% block nav_dashboard_active %}is-active{% endblock %}
-
-{% block breadcrumb %}
-    <li>Helpdesk</li>
-    <li>Dashboard</li>
-{% endblock %}
-
-{% block header_title %}Lista zgłoszeń{% endblock %}
-{% block header_subtitle %}Przegląd i filtrowanie zgłoszeń{% endblock %}
-
 {% block header_actions %}
     <a href="{% url 'password_change' %}" class="header-action">Zmień hasło</a>
     {% if is_manager or user.is_superuser %}

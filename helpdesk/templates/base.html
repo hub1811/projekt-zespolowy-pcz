@@ -227,6 +227,85 @@ body {
     background: var(--content-bg);
     border-color: var(--border-subtle);
 }
+/* ===========================================================
+   10. BREADCRUMB + TYTUŁY W NAGŁÓWKU
+=========================================================== */
+.breadcrumb {
+    margin: 0 0 4px 0;
+    padding: 0;
+    list-style: none !important;   /* 🔥 usuwa kropkę */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: #9ca3af;
+}
+
+.breadcrumb li {
+    list-style: none !important;   /* na wszelki wypadek */
+}
+
+.breadcrumb li + li::before {
+    content: "/";
+    margin: 0 4px;
+    color: #c4cad6;
+}
+
+.header-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* DARK MODE – lepszy kontrast */
+:root[data-theme="dark"] .header-title {
+    color: #f9fafb;
+}
+
+:root[data-theme="dark"] .header-subtitle {
+    color: #9ca3af;
+}
+
+:root[data-theme="dark"] .breadcrumb {
+    color: #e5e7eb;
+}
+
+:root[data-theme="dark"] .breadcrumb li + li::before {
+    color: #9ca3af;
+}
+
+:root[data-theme="dark"] .breadcrumb li:last-child {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.header-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Dark mode – lepszy kontrast */
+:root[data-theme="dark"] .header-title {
+    color: #f9fafb;
+}
+
+:root[data-theme="dark"] .header-subtitle {
+    color: #9ca3af;
+}
+
 
 </style>
 
@@ -292,26 +371,18 @@ body {
 
     <!-- PRAWA CZĘŚĆ -->
     <div class="app-main">
-        <header class="app-header">
-    <div>
-        <ul class="breadcrumb">
-    {% block breadcrumb %}
-    <li>DASHBOARD</li>
-    {% endblock %}
-</ul>
-
+<header class="app-header">
+   <!-- <div>
         <div class="header-title">{% block header_title %}Panel{% endblock %}</div>
-        <div class="header-subtitle">
-            {% block header_subtitle %}Zarządzanie zgłoszeniami{% endblock %}
-        </div>
-    </div>
+        <div class="header-subtitle">{% block header_subtitle %}Zarządzanie zgłoszeniami{% endblock %}</div>
+    </div>-->
+
     <div class="header-actions">
         <!-- PRZEŁĄCZNIK MOTYWU -->
         <button id="theme-toggle" type="button" class="header-action">
             🌙 Ciemny motyw
         </button>
 
-        <!-- Dotychczasowe przyciski -->
         {% block header_actions %}
         <a href="{% url 'password_change' %}" class="header-action">Zmień hasło</a>
         <a href="{% url 'helpdesk:zgloszenie_nowe' %}"

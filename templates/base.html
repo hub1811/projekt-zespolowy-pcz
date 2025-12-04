@@ -1,4 +1,5 @@
 {% load static %}
+{% load breadcrumbs %}
 <!doctype html>
 <html lang="pl">
 <head>
@@ -621,6 +622,97 @@
 :root[data-theme='dark'] .card * {
     color: #e5e7eb !important;
 }
+/* Breadcrumb – lepszy kontrast w dark mode */
+:root[data-theme='dark'] .breadcrumb,
+:root[data-theme='dark'] .breadcrumb a {
+    color: #e5e7eb;
+}
+
+:root[data-theme='dark'] .breadcrumb li + li::before {
+    color: #9ca3af;
+}
+
+:root[data-theme='dark'] .breadcrumb li:last-child,
+:root[data-theme='dark'] .breadcrumb li:last-child a {
+    color: #ffffff;
+    font-weight: 600;
+}
+/* BREADCRUMB + Tytuły w nagłówku */
+.breadcrumb {
+    margin: 0 0 4px 0;
+    padding: 0;
+    list-style: none !important;   /* 🔥 usuwa kropkę */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: #9ca3af;
+}
+
+.breadcrumb li {
+    list-style: none;              /* na wszelki wypadek */
+}
+
+.breadcrumb li + li::before {
+    content: "/";
+    margin: 0 4px;
+    color: #c4cad6;
+}
+
+/* Tytuł i podtytuł – żeby nie były klikane razem z breadcrumbem */
+.header-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Dark mode – lepszy kontrast */
+:root[data-theme="dark"] .header-title {
+    color: #f9fafb;
+}
+
+:root[data-theme="dark"] .header-subtitle {
+    color: #9ca3af;
+}
+
+:root[data-theme="dark"] .breadcrumb {
+    color: #e5e7eb;
+}
+
+:root[data-theme="dark"] .breadcrumb li + li::before {
+    color: #9ca3af;
+}
+
+:root[data-theme="dark"] .breadcrumb li:last-child {
+    color: #ffffff;
+    font-weight: 600;
+}
+.header-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Dark mode – lepszy kontrast */
+:root[data-theme="dark"] .header-title {
+    color: #f9fafb;
+}
+
+:root[data-theme="dark"] .header-subtitle {
+    color: #9ca3af;
+}
 
     </style>
 
@@ -658,13 +750,7 @@
                     <span>Zgłoszenia</span>
                 </a>
             </li>
-            <li class="sidebar-item">
-                <a href="#"
-                   class="sidebar-link {% block nav_knowledge_active %}{% endblock %}">
-                    <span class="icon-dot"></span>
-                    <span>Baza wiedzy</span>
-                </a>
-            </li>
+            
             {% block nav_extra %}{% endblock %}
         </ul>
 
@@ -699,13 +785,8 @@
 
         <!-- GÓRNY PASEK -->
         <header class="app-header">
-            <div class="app-header-left">
+           <div class="app-header-left">
                 <div>
-                    <ul class="breadcrumb">
-                        {% block breadcrumb %}
-                        <li>DASHBOARD</li>
-                        {% endblock %}
-                    </ul>
 
                     <div class="ticket-title">
                         {% block header_title %}Panel{% endblock %}
@@ -715,6 +796,8 @@
                     </div>
                 </div>
             </div>
+
+
            <div class="header-actions">
     <!-- PRZEŁĄCZNIK DARK MODE -->
     <button id="theme-toggle" type="button" class="header-action">

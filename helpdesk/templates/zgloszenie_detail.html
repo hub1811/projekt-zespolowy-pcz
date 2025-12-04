@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 
+
 {% block title %}Zgłoszenie #{{ zgloszenie.id }}{% endblock %}
 {% block nav_dashboard_active %}is-active{% endblock %}
 
-{% block breadcrumb %}
-    <li>Helpdesk</li>
-    <li><a href="{% url 'helpdesk:dashboard' %}" class="text-decoration-none">Dashboard</a></li>
-    <li>#{{ zgloszenie.id }}</li>
-{% endblock %}
+
+
 
 {% block header_title %}Zgłoszenie #{{ zgloszenie.id }}{% endblock %}
 {% block header_subtitle %}{{ zgloszenie.tytul }}{% endblock %}
