@@ -18,6 +18,25 @@ class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         status_filter = request.GET.get("status", "")
         kategoria_filter = request.GET.get("kategoria", "")
+        sort_field = request.GET.get("sort", "id")
+        sort_dir = request.GET.get("dir", "desc").lower()
+
+        allowed_sorts = {
+            "id": "id",
+            "tytul": "tytul",
+            "kategoria": "kategoria",
+            "status": "status",
+            "priorytet": "priorytet",
+            "data": "data_utworzenia",
+        }
+
+        if sort_field not in allowed_sorts:
+            sort_field = "id"
+        if sort_dir not in ("asc", "desc"):
+            sort_dir = "desc"
+        order_expr = allowed_sorts[sort_field]
+        if sort_dir == "desc":
+            order_expr = f"-{order_expr}"
 
         user = request.user
 
@@ -81,7 +100,7 @@ class DashboardView(LoginRequiredMixin, View):
         if kategoria_filter:
             zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.filter(kategoria=kategoria_filter)
 
-        zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.order_by("-id")
+        zgloszenia_do_wyswietlenia = zgloszenia_do_wyswietlenia.order_by(order_expr)
 
         context = {
             # Do tabeli przekazujemy listę po dodatkowych filtrach
@@ -94,6 +113,8 @@ class DashboardView(LoginRequiredMixin, View):
             "status_filter": status_filter,
             "kategoria_filter": kategoria_filter,
             "is_manager": is_manager,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
         }
         return render(request, "dashboard.html", context)
 

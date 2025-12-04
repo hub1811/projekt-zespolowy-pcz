@@ -1,0 +1,660 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}Panel administratora | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --sidebar-bg: #151b26;
+        --sidebar-bg-active: #111822;
+        --sidebar-text: #c7cbd5;
+        --sidebar-text-active: #ffffff;
+        --page-bg: #f5f7fb;
+        --content-bg: #ffffff;
+        --border-subtle: #e3e7ed;
+        --border-strong: #c4cad6;
+        --accent: #2f80ed;
+        --accent-soft: #e3efff;
+        --danger: #e5494d;
+        --radius-lg: 12px;
+        --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    :root[data-theme='dark'] {
+        --sidebar-bg: #0f0f15;
+        --sidebar-bg-active: #14141d;
+        --sidebar-text: #b0b6c3;
+        --sidebar-text-active: #ffffff;
+        --page-bg: #0d0d12;
+        --content-bg: #1b1b23;
+        --border-subtle: #2a2a33;
+        --border-strong: #3a3a44;
+        --accent: #4c8dff;
+        --accent-soft: #233356;
+        --danger: #f97373;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--page-bg);
+        color: #1f2933;
+    }
+
+    :root[data-theme='dark'] body {
+        color: #e5e7eb;
+    }
+
+    #container {
+        padding: 18px 20px 28px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* Top bar */
+    #header {
+        background: var(--content-bg);
+        color: #0f172a;
+        border-radius: 14px;
+        padding: 14px 20px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--border-subtle);
+    }
+
+    :root[data-theme='dark'] #header {
+        background: var(--sidebar-bg);
+        color: #fff;
+        border: 1px solid var(--border-subtle);
+    }
+
+    #branding h1,
+    #branding h1 a,
+    #branding h1 a:link,
+    #branding h1 a:visited,
+    #branding h1 a:hover,
+    #branding h1 a:active {
+        color: #0f172a !important;
+        font-size: 18px;
+        letter-spacing: 0.01em;
+        font-weight: 700;
+    }
+
+    #branding small {
+        color: #475569 !important;
+    }
+
+    /* Dodatkowe wymuszenie kolorów brandingu */
+    #branding #site-name a {
+        color: #0f172a !important;
+        font-weight: 700;
+    }
+
+    #branding #site-name span {
+        color: #475569 !important;
+    }
+
+    /* Wariant ciemny brandingu */
+    :root[data-theme='dark'] #branding h1,
+    :root[data-theme='dark'] #branding h1 a,
+    :root[data-theme='dark'] #branding h1 a:link,
+    :root[data-theme='dark'] #branding h1 a:visited,
+    :root[data-theme='dark'] #branding h1 a:hover,
+    :root[data-theme='dark'] #branding h1 a:active,
+    :root[data-theme='dark'] #branding #site-name a {
+        color: #ffffff !important;
+    }
+
+    :root[data-theme='dark'] #branding small,
+    :root[data-theme='dark'] #branding #site-name span {
+        color: #c7cbd5 !important;
+    }
+
+    :root[data-theme='dark'] #branding h1,
+    :root[data-theme='dark'] #branding h1 a {
+        color: #fff;
+    }
+
+    :root[data-theme='dark'] #branding small {
+        color: #c7cbd5;
+    }
+
+    #user-tools {
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    :root[data-theme='dark'] #user-tools {
+        color: #c7cbd5;
+    }
+
+    #user-tools .pill-link,
+    #admin-theme-toggle {
+        color: #0f172a;
+        text-decoration: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 6px 12px;
+        background: #e9edf3;
+        font-size: 13px;
+        line-height: 1.2;
+        font-weight: 700;
+    }
+
+    #user-tools .pill-link:link,
+    #user-tools .pill-link:visited {
+        color: #0f172a;
+    }
+
+    #user-tools .pill-link:hover,
+    #admin-theme-toggle:hover {
+        color: #0b1224;
+        text-decoration: none;
+        background: #dbe4f2;
+        border-color: #b7c5d8;
+    }
+
+    :root[data-theme='dark'] #user-tools .pill-link,
+    :root[data-theme='dark'] #admin-theme-toggle {
+        color: #c7cbd5;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    :root[data-theme='dark'] #user-tools .pill-link:link,
+    :root[data-theme='dark'] #user-tools .pill-link:visited {
+        color: #c7cbd5;
+    }
+
+    :root[data-theme='dark'] #user-tools .pill-link:hover,
+    :root[data-theme='dark'] #admin-theme-toggle:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    #user-tools .user-greeting {
+        color: #1f2937;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding-right: 4px;
+    }
+
+    :root[data-theme='dark'] #user-tools .user-greeting {
+        color: #c7cbd5;
+    }
+
+    /* Hide Django default theme toggle (moon icon) */
+    .theme-toggle {
+        display: none !important;
+    }
+
+    /* Theme toggle */
+    #admin-theme-toggle {
+        margin-left: 4px;
+        cursor: pointer;
+    }
+
+    /* Breadcrumbs */
+    div.breadcrumbs {
+        background: transparent;
+        color: #6b7280;
+        padding: 12px 4px;
+        font-size: 13px;
+    }
+
+    div.breadcrumbs a {
+        color: #2f80ed;
+        font-weight: 600;
+    }
+
+    /* Main area */
+    #content {
+        margin: 18px auto 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    /* Dashboard grid */
+    #content.dashboard {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) 320px;
+        gap: 18px;
+        align-items: start;
+    }
+
+    #content-main, #changelist {
+        background: var(--content-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 18px 18px 10px;
+    }
+
+    /* Right column on dashboard */
+    #content-related {
+        background: var(--content-bg);
+        color: #0f172a;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--border-subtle);
+        padding: 14px 12px;
+    }
+
+    #content-related h2 {
+        color: #0f172a;
+        font-size: 15px;
+        margin: 4px 0 10px;
+    }
+
+    #content-related h3 {
+        color: #111827;
+        font-size: 13px;
+        margin: 8px 0;
+    }
+
+    #content-related .module {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    #content-related .actionlist li {
+        border-color: var(--border-subtle);
+    }
+
+    #content-related a {
+        color: #0f172a;
+    }
+
+    #content-related a:hover {
+        color: var(--accent);
+    }
+
+    :root[data-theme='dark'] #content-related {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    :root[data-theme='dark'] #content-related h2 {
+        color: #fff;
+    }
+
+    :root[data-theme='dark'] #content-related h3 {
+        color: #c7cbd5;
+    }
+
+    :root[data-theme='dark'] #content-related .actionlist li {
+        border-color: rgba(255,255,255,0.08);
+    }
+
+    :root[data-theme='dark'] #content-related a {
+        color: #fff;
+    }
+
+    :root[data-theme='dark'] #content-related a:hover {
+        color: #cfe3ff;
+    }
+
+    .module, .dashboard .module {
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        background: var(--content-bg);
+        margin-bottom: 14px;
+        overflow: hidden;
+    }
+
+    .module caption,
+    .dashboard .module h2 {
+        background: #f7f9fc;
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 12px 14px;
+        font-weight: 700;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        color: #0f172a !important;
+        letter-spacing: 0.01em;
+        opacity: 1 !important;
+    }
+
+    .module caption a,
+    .dashboard .module h2 a {
+        color: #0f172a;
+    }
+
+    /* Wymuszenie ciemnego koloru nagłówków sekcji w jasnym motywie */
+    #content .dashboard h2,
+    #content .dashboard .module h2,
+    #content .module caption {
+        color: #0f172a !important;
+        opacity: 1 !important;
+    }
+
+    #content .dashboard h2 a,
+    #content .module caption a {
+        color: #0f172a !important;
+    }
+
+    /* Wariant ciemny dla silniejszych selektorów */
+    :root[data-theme='dark'] #content .dashboard h2,
+    :root[data-theme='dark'] #content .dashboard .module h2,
+    :root[data-theme='dark'] #content .module caption {
+        color: #ffffff !important;
+    }
+
+    :root[data-theme='dark'] #content .dashboard h2 a,
+    :root[data-theme='dark'] #content .module caption a {
+        color: #ffffff !important;
+    }
+
+    .module table {
+        border-collapse: collapse;
+    }
+
+    table thead th {
+        background: #f7f9fc;
+        color: #111827;
+        font-weight: 600;
+        border-color: var(--border-subtle);
+    }
+
+    table th, table td {
+        padding: 10px;
+        border-color: var(--border-subtle);
+    }
+
+    table a {
+        color: #111827;
+        font-weight: 600;
+    }
+
+    :root[data-theme='dark'] table a {
+        color: #e5e7eb;
+    }
+
+    :root[data-theme='dark'] table a:hover {
+        color: var(--accent);
+    }
+
+    /* Nagłówki i teksty w treści */
+    #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+        color: #111827;
+    }
+
+    :root[data-theme='dark'] #content h1,
+    :root[data-theme='dark'] #content h2,
+    :root[data-theme='dark'] #content h3,
+    :root[data-theme='dark'] #content h4,
+    :root[data-theme='dark'] #content h5,
+    :root[data-theme='dark'] #content h6 {
+        color: #e5e7eb;
+    }
+
+    table a:hover {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+    .row1 { background: #ffffff; }
+    .row2 { background: #f9fbff; }
+
+    :root[data-theme='dark'] .row1 { background: #1b1b23; }
+    :root[data-theme='dark'] .row2 { background: #16161e; }
+
+    :root[data-theme='dark'] table thead th {
+        background: #24242c;
+        color: #ffffff;
+    }
+
+    :root[data-theme='dark'] .module caption,
+    :root[data-theme='dark'] .dashboard .module h2 {
+        background: #24242c;
+        color: #ffffff !important;
+        border-color: var(--border-subtle);
+    }
+
+    :root[data-theme='dark'] .module caption a,
+    :root[data-theme='dark'] .dashboard .module h2 a {
+        color: #ffffff;
+    }
+
+    .dashboard .module table {
+        width: 100%;
+    }
+
+    /* Sidebar nav */
+    #nav-sidebar {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255,255,255,0.04);
+        box-shadow: var(--shadow-soft);
+        padding: 8px 10px;
+    }
+
+    #nav-sidebar .module caption {
+        background: transparent;
+        color: #8c93a7;
+        border: none;
+        padding: 8px 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    #nav-sidebar .module li a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 10px;
+        color: var(--sidebar-text);
+        text-decoration: none;
+    }
+
+    #nav-sidebar .module li a:hover,
+    #nav-sidebar .module li a:focus {
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+    }
+
+    #nav-sidebar .module li.current-model > a {
+        background: var(--sidebar-bg-active);
+        color: var(--sidebar-text-active);
+    }
+
+    /* Buttons */
+    .button, input[type=submit], input[type=button], .submit-row input {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        box-shadow: var(--shadow-soft);
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover {
+        background: #2569c4;
+    }
+
+    .deletelink, .deletelink:link, .deletelink:visited {
+        background: var(--danger);
+    }
+
+    /* Forms */
+    input, select, textarea {
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        padding: 8px 10px;
+        font-size: 14px;
+        width: 100%;
+        max-width: 460px;
+    }
+
+    :root[data-theme='dark'] input,
+    :root[data-theme='dark'] select,
+    :root[data-theme='dark'] textarea {
+        background-color: #1a1a22;
+        color: #e5e7eb;
+        border-color: #2e2e39;
+    }
+
+    select {
+        max-width: none;
+    }
+
+    fieldset.module.aligned > div.form-row {
+        padding: 12px 14px;
+    }
+
+    .aligned label {
+        color: #4b5563;
+        font-weight: 600;
+    }
+
+    :root[data-theme='dark'] .aligned label {
+        color: #d1d5dc;
+    }
+
+    /* Object tools */
+    .object-tools {
+        margin: 0 0 12px;
+        padding: 0;
+        display: flex;
+        gap: 10px;
+    }
+
+    .object-tools li a {
+        background: var(--accent-soft);
+        color: #1f2937;
+        border-radius: 999px;
+        padding: 8px 12px;
+        border: 1px solid var(--accent);
+    }
+
+    .object-tools li a:hover {
+        background: #cfe3ff;
+        color: #0b3d91;
+    }
+
+    /* Messages */
+    ul.messagelist li {
+        border-radius: 10px;
+        padding: 10px 12px;
+    }
+
+    ul.messagelist li.success {
+        background: #e3f7e9;
+        border: 1px solid #8dd7a5;
+        color: #1f5130;
+    }
+
+    ul.messagelist li.warning {
+        background: #fff8e6;
+        border: 1px solid #f0cd6c;
+        color: #7c5a05;
+    }
+
+    ul.messagelist li.error {
+        background: #fde7e7;
+        border: 1px solid #f5b2b2;
+        color: #821d1d;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 1024px) {
+        #nav-sidebar { margin-bottom: 12px; }
+        #content.dashboard {
+            grid-template-columns: 1fr;
+        }
+        #content-related {
+            grid-column: 1 / -1;
+        }
+        #content-main, #changelist { padding: 14px; }
+        #header { border-radius: 12px; }
+    }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+(function () {
+    const STORAGE_KEY = 'helpdesk-theme';
+    const root = document.documentElement;
+    let currentTheme = 'light';
+
+    function applyTheme(theme, persist) {
+        currentTheme = theme || 'light';
+        root.setAttribute('data-theme', currentTheme);
+        if (persist) {
+            localStorage.setItem(STORAGE_KEY, currentTheme);
+        }
+        const btn = document.getElementById('admin-theme-toggle');
+        if (btn) {
+            btn.textContent = currentTheme === 'dark' ? '☀ Jasny motyw' : '🌙 Ciemny motyw';
+        }
+    }
+
+    // Start with saved/system preference
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'), false);
+
+    // Add toggle button once DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        const tools = document.getElementById('user-tools');
+        if (!tools) return;
+
+        const links = Array.from(tools.querySelectorAll('a')).filter(a => !a.classList.contains('theme-toggle'));
+        links.forEach(link => link.classList.add('pill-link'));
+
+        const btn = document.getElementById('admin-theme-toggle');
+        if (btn) {
+            btn.textContent = currentTheme === 'dark' ? '☀ Jasny motyw' : '🌙 Ciemny motyw';
+            btn.addEventListener('click', function () {
+                const next = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(next, true);
+            });
+        }
+    });
+
+    // React to changes from other tabs
+    window.addEventListener('storage', function (event) {
+        if (event.key === STORAGE_KEY && event.newValue) {
+            applyTheme(event.newValue, false);
+        }
+    });
+})();
+</script>
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">Panel administratora</a>
+    <span style="display:block; font-size:12px; color:#9ca3b3;">Helpdesk</span>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block usertools %}
+{% if has_permission %}
+<div id="user-tools">
+    <span class="user-greeting" aria-hidden="true">Witaj, {{ user.get_username }}</span>
+    {% if site_url %}
+    <a href="{{ site_url }}" class="pill-link">{% translate 'Powrót do aplikacji' %}</a>
+    {% endif %}
+    {% if user.is_active and user.is_staff %}
+    <a href="{% url 'admin:password_change' %}" class="pill-link">{% translate 'Zmień hasło' %}</a>
+    {% endif %}
+    <a href="{% url 'admin:logout' %}" class="pill-link">{% translate 'Wyloguj się' %}</a>
+    <button id="admin-theme-toggle" type="button" aria-label="{% translate 'Przełącz motyw' %}"></button>
+</div>
+{% endif %}
+{% endblock %}

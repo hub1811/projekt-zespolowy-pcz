@@ -1,0 +1,171 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% translate 'Logowanie administracyjne' %}{% endblock %}
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body.login {
+        background: radial-gradient(circle at 20% 20%, rgba(47,128,237,0.06), transparent 35%),
+                    radial-gradient(circle at 80% 10%, rgba(229,73,77,0.08), transparent 30%),
+                    var(--page-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .login-shell {
+        width: 100%;
+        max-width: 480px;
+        padding: 18px;
+    }
+
+    .login-card {
+        background: var(--content-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 22px;
+    }
+
+    .login-card-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .login-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ffb545, #ff5f6d);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .login-card h1 {
+        margin: 0;
+        font-size: 20px;
+        color: #111827;
+    }
+
+    .login-subtitle {
+        margin: 2px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .login-form .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .login-form label {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .login-form input {
+        width: 100%;
+    }
+
+    .login-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    .login-footer {
+        margin-top: 12px;
+        color: #6b7280;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .errornote {
+        background: #fde7e7;
+        border: 1px solid #f5b2b2;
+        color: #821d1d;
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin: 0 0 10px;
+    }
+
+    .errorlist {
+        color: #b91c1c;
+        margin: 0;
+        list-style: none;
+        padding-left: 0;
+        font-size: 13px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-shell">
+    <div class="login-card">
+        <div class="login-card-head">
+            <div class="login-logo"></div>
+            <div>
+                <h1>Panel administratora</h1>
+                <p class="login-subtitle">Zarządzaj zgłoszeniami i użytkownikami</p>
+            </div>
+        </div>
+
+        {% if form.errors and not form.non_field_errors %}
+            <p class="errornote">
+                {% blocktranslate count counter=form.errors|length %}
+                    Popraw widoczne poniżej pole.
+                {% plural %}
+                    Popraw widoczne poniżej pola.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <p class="errornote">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div id="content-main">
+            <form action="{{ form_url }}" method="post" id="login-form" class="login-form">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    {{ form.username.errors }}
+                    <label for="{{ form.username.id_for_label }}">{% translate 'Login' %}</label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-row">
+                    {{ form.password.errors }}
+                    <label for="{{ form.password.id_for_label }}">{% translate 'Hasło' %}</label>
+                    {{ form.password }}
+                    <input type="hidden" name="next" value="{{ next }}">
+                </div>
+
+                <div class="login-actions">
+                    {% url 'admin_password_reset' as password_reset_url %}
+                    {% if password_reset_url %}
+                        <a href="{{ password_reset_url }}">{% translate 'Nie pamiętasz hasła?' %}</a>
+                    {% endif %}
+                    <input type="submit" value="{% translate 'Zaloguj' %}">
+                </div>
+            </form>
+        </div>
+
+        <p class="login-footer">
+            {% translate "Wróć do strony głównej" %}:
+            <a href="{% url 'helpdesk:dashboard' %}">Helpdesk</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
