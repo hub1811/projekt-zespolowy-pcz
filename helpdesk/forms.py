@@ -7,6 +7,23 @@ class ZgloszenieForm(forms.ModelForm):
         model = Zgloszenie
         # Jeśli u Ciebie pola nazywają się trochę inaczej – zmień tylko listę poniżej.
         fields = ['tytul', 'opis', 'kategoria', 'priorytet']
+        widgets = {
+            'tytul': forms.TextInput(attrs={
+                'class': 'form-control form-control-lg',
+                'placeholder': 'Np. Komputer nie uruchamia się',
+            }),
+            'opis': forms.Textarea(attrs={
+                'class': 'form-control ticket-textarea',
+                'rows': '8',
+                'placeholder': 'Opisz, co się dzieje, jakie komunikaty się pojawiają oraz kiedy występuje problem.',
+            }),
+            'kategoria': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'priorytet': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+        }
         # awaryjnie możesz dać:
         # fields = '__all__'
 

@@ -2,22 +2,86 @@
 
 {% block title %}Nowe zgłoszenie{% endblock %}
 {% block nav_newticket_active %}is-active{% endblock %}
-
-
+{% block header_title %}Nowe zgłoszenie{% endblock %}
+{% block header_subtitle %}Opisz problem, a my zajmiemy się resztą.{% endblock %}
 {% block header_actions %}
     <a href="{% url 'helpdesk:dashboard' %}" class="header-action">&larr; Powrót do listy</a>
 {% endblock %}
 
 {% block main_column %}
     <div class="column-main-header">
-        Formularz zgłoszenia
+        <div class="header-title mb-0">Formularz zgłoszenia</div>
+        <span class="ticket-pill">Nowy ticket</span>
     </div>
     <div class="column-main-body">
-        <form method="post" class="card shadow-sm">
+        <form method="post" class="card shadow-sm ticket-form">
             <div class="card-body">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-success">Zapisz</button>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mb-3">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="ticket-form__grid">
+                    <div class="ticket-form__group ticket-form__group--full">
+                        <label for="{{ form.tytul.id_for_label }}" class="ticket-form__label">Tytuł zgłoszenia</label>
+                        {{ form.tytul }}
+                        <p class="ticket-form__hint">Krótki, konkretny tytuł ułatwi szybką identyfikację.</p>
+                        {% if form.tytul.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.tytul.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="ticket-form__group ticket-form__group--full">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="{{ form.opis.id_for_label }}" class="ticket-form__label mb-0">Opis problemu</label>
+                            <span class="ticket-form__hint">Dodaj kroki, które już sprawdziłeś.</span>
+                        </div>
+                        {{ form.opis }}
+                        {% if form.opis.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.opis.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="ticket-form__group">
+                        <label for="{{ form.kategoria.id_for_label }}" class="ticket-form__label">Kategoria</label>
+                        {{ form.kategoria }}
+                        {% if form.kategoria.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.kategoria.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="ticket-form__group">
+                        <label for="{{ form.priorytet.id_for_label }}" class="ticket-form__label">Priorytet</label>
+                        {{ form.priorytet }}
+                        {% if form.priorytet.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.priorytet.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="ticket-form__footer">
+                    <div class="d-flex flex-column gap-1">
+                        <span class="ticket-pill">Status startowy: Nowe</span>
+                        <p class="ticket-form__hint mb-0">Po zapisaniu przejdziesz do szczegółów zgłoszenia.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'helpdesk:dashboard' %}" class="btn btn-outline-secondary">Wróć</a>
+                        <button type="submit" class="btn btn-primary btn-lg">Zapisz zgłoszenie</button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

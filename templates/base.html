@@ -412,6 +412,14 @@
             color: #6b7280;
         }
 
+        :root[data-theme='dark'] .ticket-title {
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .ticket-subtitle {
+            color: #c7ccd8;
+        }
+
         .app-header-right {
             display: flex;
             align-items: center;
@@ -471,6 +479,63 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            /* wymuszenie widocznych zaokrągleń */
+            border-radius: var(--radius-xl) !important;
+        }
+
+        /* dodatkowe wymuszenie dla kontenerów kolumn */
+        .app-columns > .column-main,
+        .app-columns > .column-side {
+            border-radius: var(--radius-xl) !important;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle) !important;
+            box-shadow: var(--shadow-soft) !important;
+        }
+
+        /* dziedziczenie promienia przez sekcje */
+        .column-main-header {
+            border-top-left-radius: var(--radius-xl) !important;
+            border-top-right-radius: var(--radius-xl) !important;
+        }
+
+        .column-main-body:last-child,
+        .column-main-footer:last-child {
+            border-bottom-left-radius: var(--radius-xl) !important;
+            border-bottom-right-radius: var(--radius-xl) !important;
+        }
+
+        .column-side-header,
+        .column-side > .side-header {
+            border-top-left-radius: var(--radius-xl) !important;
+            border-top-right-radius: var(--radius-xl) !important;
+        }
+
+        .column-side-body:last-child,
+        .column-side > *:last-child {
+            border-bottom-left-radius: var(--radius-xl) !important;
+            border-bottom-right-radius: var(--radius-xl) !important;
+        }
+
+        /* wymuszenie zaokrągleń na krawędziach paneli */
+        .column-main > .column-main-header:first-of-type {
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+        }
+
+        .column-main > .column-main-footer:last-of-type,
+        .column-main > .column-main-body:last-of-type {
+            border-bottom-left-radius: var(--radius-xl);
+            border-bottom-right-radius: var(--radius-xl);
+        }
+
+        .column-side > *:first-of-type {
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+        }
+
+        .column-side > *:last-of-type {
+            border-bottom-left-radius: var(--radius-xl);
+            border-bottom-right-radius: var(--radius-xl);
         }
 
         .column-main-header {
@@ -492,6 +557,42 @@
             border-top: 1px solid var(--border-subtle);
             padding: 10px 14px;
             background: #fbfcff;
+        }
+
+        /* Spójne karty/panele */
+        .card {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .card-header:first-child {
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .card > .card-body:last-child {
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        /* Zaokrąglenia paneli głównych */
+        .column-main-header:first-child {
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+        }
+
+        .column-main-footer:last-child {
+            border-bottom-left-radius: var(--radius-xl);
+            border-bottom-right-radius: var(--radius-xl);
+        }
+
+        .column-side > *:first-child {
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+        }
+
+        .column-side > *:last-child {
+            border-bottom-left-radius: var(--radius-xl);
+            border-bottom-right-radius: var(--radius-xl);
         }
 
         /* Wiadomości w wątku -------------------------------------------- */
@@ -716,6 +817,134 @@
 
     </style>
 
+    <style>
+        /* Formularz zgłoszenia */
+        .ticket-form.card {
+            border-radius: 18px;
+            border: 1px solid var(--border-subtle);
+            background: linear-gradient(135deg, #f8fbff 0%, #ffffff 50%, #fcfdff 100%);
+        }
+
+        :root[data-theme='dark'] .ticket-form.card {
+            border-color: #2a2a33;
+            background: linear-gradient(135deg, #11131b 0%, #141623 50%, #12121c 100%);
+        }
+
+        .ticket-form__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .ticket-form__group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ticket-form__group--full {
+            grid-column: 1 / -1;
+        }
+
+        .ticket-form__label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .ticket-form__hint {
+            margin: 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        :root[data-theme='dark'] .ticket-form__label {
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .ticket-form__hint {
+            color: #9ca3af;
+        }
+
+        .ticket-form .form-control,
+        .ticket-form .form-select {
+            border-radius: 12px;
+            border-color: var(--border-strong);
+            background: #f9fafb;
+            color: #0f172a;
+        }
+
+        .ticket-form .form-control:focus,
+        .ticket-form .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.15);
+            border-color: var(--accent);
+        }
+
+        :root[data-theme='dark'] .ticket-form .form-control,
+        :root[data-theme='dark'] .ticket-form .form-select {
+            border-color: #2e2e39;
+            background: #101019;
+            color: #e5e7eb;
+        }
+
+        :root[data-theme='dark'] .ticket-form .form-control:focus,
+        :root[data-theme='dark'] .ticket-form .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(76, 141, 255, 0.2);
+            border-color: #4c8dff;
+        }
+
+        .ticket-form .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        :root[data-theme='dark'] .ticket-form .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .ticket-textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .ticket-form__footer {
+            margin-top: 10px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ticket-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #1f2937;
+            border: 1px solid var(--border-strong);
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        :root[data-theme='dark'] .ticket-pill {
+            background: rgba(76, 141, 255, 0.12);
+            border-color: #233356;
+            color: #dbeafe;
+        }
+
+        @media (max-width: 768px) {
+            .ticket-form__footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+
 
     {% block extra_head %}{% endblock %}
 </head>
@@ -816,9 +1045,9 @@
         <!-- OBSZAR ROBOCZY – DWA PANELE JAK NA ZRZUCIE -->
         <main class="app-content">
             <div class="app-columns">
-                <section class="column-main">
+                <section class="column-main" style="border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft);">
                     {% block main_column %}
-                    <!-- domyślna treść – wątek zgłoszenia -->
+                    <!-- domyślna treść — wątek zgłoszenia -->
                     <div class="column-main-header">
                         <div>
                             <strong>Zgłoszenie #123456</strong><br>
@@ -858,7 +1087,7 @@
                     {% endblock %}
                 </section>
 
-                <aside class="column-side">
+                <aside class="column-side" style="border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft);">
                     {% block side_column %}
                     <div class="side-header">
                         <div class="side-header-title">Szczegóły zgłoszenia</div>

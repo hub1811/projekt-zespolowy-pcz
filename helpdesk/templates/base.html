@@ -146,8 +146,23 @@ body {
     background: var(--content-bg);
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+.column-main-header:first-child,
+.column-side > *:first-child {
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+}
+
+.column-main-body:last-child,
+.column-main-footer:last-child,
+.column-side > *:last-child {
+    border-bottom-left-radius: var(--radius-xl);
+    border-bottom-right-radius: var(--radius-xl);
 }
 
 /* ===========================================================
