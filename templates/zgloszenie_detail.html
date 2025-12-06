@@ -18,8 +18,47 @@
 {% endblock %}
 
 {% block main_column %}
-    <!-- tutaj wstawiasz swoje istniejące HTML z wątkiem zgłoszenia,
-         wykorzystując klasy .msg, .msg-bubble itd. -->
+    <div class="column-main">
+        <div class="column-main-header">
+            <div>
+                <div class="ticket-title">{{ zgloszenie.tytul }}</div>
+                <div class="ticket-subtitle">Zgłoszenie #{{ zgloszenie.id }} &bull; {{ zgloszenie.data_utworzenia|date:"d.m.Y H:i" }}</div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary">{{ zgloszenie.get_status_display }}</span>
+                <span class="badge bg-secondary">{{ zgloszenie.get_priorytet_display }}</span>
+            </div>
+        </div>
+
+        <div class="column-main-body">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Szczegóły</h6>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="fw-semibold">Kategoria</div>
+                            <div>{{ zgloszenie.kategoria|default:"—" }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-semibold">Przypisane do</div>
+                            <div>{{ zgloszenie.przypisane_do|default:"(brak)" }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fw-semibold">Zgłoszone przez</div>
+                            <div>{{ zgloszenie.zgloszone_przez }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Opis</h6>
+                    <p class="mb-0">{{ zgloszenie.opis|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block side_column %}

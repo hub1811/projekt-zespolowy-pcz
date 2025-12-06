@@ -32,6 +32,26 @@
         padding: 22px;
     }
 
+    .login-theme-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        border-radius: 999px;
+        border: 1px solid var(--border-subtle);
+        background: var(--content-bg);
+        color: #0f172a;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+    }
+
+    :root[data-theme='dark'] .login-theme-toggle {
+        color: #e5e7eb;
+        border-color: rgba(255,255,255,0.14);
+        background: #1b1c24;
+    }
+
     .login-card-head {
         display: flex;
         align-items: center;
@@ -109,6 +129,7 @@
 {% endblock %}
 
 {% block content %}
+<button type="button" id="login-theme-toggle" class="login-theme-toggle">Motyw: jasny</button>
 <div class="login-shell">
     <div class="login-card">
         <div class="login-card-head">
@@ -168,4 +189,51 @@
         </p>
     </div>
 </div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+(function() {
+    const STORAGE_KEY = 'helpdesk-theme';
+    const root = document.documentElement;
+    const btn = document.getElementById('login-theme-toggle');
+    const media = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+    if (!btn) return;
+
+    function apply(theme, persist) {
+        const next = theme === 'dark' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        if (persist) {
+            localStorage.setItem(STORAGE_KEY, next);
+        }
+        btn.textContent = next === 'dark' ? 'Motyw: ciemny' : 'Motyw: jasny';
+    }
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    apply(saved || (media && media.matches ? 'dark' : 'light'), false);
+
+    btn.addEventListener('click', function() {
+        const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        apply(next, true);
+    });
+
+    if (media && media.addEventListener) {
+        media.addEventListener('change', function(e) {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                apply(e.matches ? 'dark' : 'light', false);
+            }
+        });
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === STORAGE_KEY && e.newValue) {
+            apply(e.newValue, false);
+        }
+    });
+})();
+</script>
 {% endblock %}

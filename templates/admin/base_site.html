@@ -7,10 +7,13 @@
 {{ block.super }}
 <style>
     :root {
-        --sidebar-bg: #151b26;
-        --sidebar-bg-active: #111822;
-        --sidebar-text: #c7cbd5;
-        --sidebar-text-active: #ffffff;
+        --sidebar-bg: #f7f9fc;
+        --sidebar-bg-active: #e7efff;
+        --sidebar-hover-bg: #eef3fb;
+        --sidebar-text: #2f3542;
+        --sidebar-text-active: #0f172a;
+        --sidebar-border: #d9e1ef;
+        --sidebar-muted: #5b6475;
         --page-bg: #f5f7fb;
         --content-bg: #ffffff;
         --border-subtle: #e3e7ed;
@@ -25,8 +28,11 @@
     :root[data-theme='dark'] {
         --sidebar-bg: #0f0f15;
         --sidebar-bg-active: #14141d;
+        --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
         --sidebar-text: #b0b6c3;
         --sidebar-text-active: #ffffff;
+        --sidebar-border: rgba(255,255,255,0.12);
+        --sidebar-muted: #6f7688;
         --page-bg: #0d0d12;
         --content-bg: #1b1b23;
         --border-subtle: #2a2a33;
@@ -433,37 +439,98 @@
         background: var(--sidebar-bg);
         color: var(--sidebar-text);
         border-radius: var(--radius-lg);
-        border: 1px solid rgba(255,255,255,0.04);
+        border: 1px solid var(--sidebar-border);
         box-shadow: var(--shadow-soft);
         padding: 8px 10px;
     }
 
+    :root[data-theme='dark'] #nav-sidebar {
+        background: #0f1118;
+        border-color: #2f3545;
+    }
+
     #nav-sidebar .module caption {
         background: transparent;
-        color: #8c93a7;
+        color: var(--sidebar-text) !important;
         border: none;
         padding: 8px 10px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
+        font-weight: 800;
+        opacity: 1 !important;
+    }
+
+    #nav-sidebar .module caption a,
+    #nav-sidebar .module h2,
+    #nav-sidebar .module h2 a {
+        color: var(--sidebar-text) !important;
+        opacity: 1 !important;
+        text-decoration: none;
+    }
+
+    :root[data-theme='dark'] #nav-sidebar .module caption,
+    :root[data-theme='dark'] #nav-sidebar .module h2,
+    :root[data-theme='dark'] #nav-sidebar .module h2 a {
+        color: #e8ecf5 !important;
     }
 
     #nav-sidebar .module li a {
         display: block;
         padding: 8px 10px;
         border-radius: 10px;
-        color: var(--sidebar-text);
+        color: var(--sidebar-text-active) !important;
         text-decoration: none;
+        font-weight: 600;
+        background: #ffffff;
+        opacity: 1 !important;
+    }
+
+    :root[data-theme='dark'] #nav-sidebar .module li a {
+        background: #161a24;
+        color: #e8ecf5 !important;
     }
 
     #nav-sidebar .module li a:hover,
     #nav-sidebar .module li a:focus {
-        background: rgba(255, 255, 255, 0.06);
-        color: #fff;
+        background: var(--sidebar-hover-bg);
+        color: #0f172a !important;
+    }
+
+    :root[data-theme='dark'] #nav-sidebar .module li a:hover,
+    :root[data-theme='dark'] #nav-sidebar .module li a:focus {
+        color: #ffffff !important;
+        background: #1f2432;
     }
 
     #nav-sidebar .module li.current-model > a {
-        background: var(--sidebar-bg-active);
-        color: var(--sidebar-text-active);
+        background: #e3efff !important;
+        color: #0f172a !important;
+        opacity: 1 !important;
+    }
+
+    :root[data-theme='dark'] #nav-sidebar .module li.current-model > a {
+        background: #1f2d4a !important;
+        color: #ffffff !important;
+    }
+
+    #nav-sidebar input#nav-filter {
+        border: 1px solid var(--sidebar-border);
+        background: #fff;
+        color: var(--sidebar-text);
+    }
+
+    :root[data-theme='dark'] #nav-sidebar input#nav-filter {
+        background: #11131b;
+        color: #e8ecf5;
+        border-color: #2f3545;
+    }
+
+    #nav-sidebar input#nav-filter::placeholder {
+        color: #6b7280;
+    }
+
+    :root[data-theme='dark'] #nav-sidebar input#nav-filter::placeholder {
+        color: #9ca3af;
     }
 
     /* Buttons */
@@ -653,7 +720,12 @@
     {% if user.is_active and user.is_staff %}
     <a href="{% url 'admin:password_change' %}" class="pill-link">{% translate 'Zmień hasło' %}</a>
     {% endif %}
-    <a href="{% url 'admin:logout' %}" class="pill-link">{% translate 'Wyloguj się' %}</a>
+    <form id="admin-logout-form" action="{% url 'logout' %}" method="post" style="display:none;">
+        {% csrf_token %}
+    </form>
+    <button type="button" class="pill-link" onclick="document.getElementById('admin-logout-form').submit(); return false;">
+        {% translate 'Wyloguj się' %}
+    </button>
     <button id="admin-theme-toggle" type="button" aria-label="{% translate 'Przełącz motyw' %}"></button>
 </div>
 {% endif %}

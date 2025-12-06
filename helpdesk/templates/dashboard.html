@@ -197,15 +197,122 @@
         Szybkie statystyki
     </div>
     <div class="column-side-body">
-        <p class="mb-1"><strong>Łącznie zgłoszeń:</strong> {{ total_count }}</p>
-        <hr>
-        <ul class="list-unstyled mb-0">
-            {% for s in status_cards %}
-                <li class="d-flex justify-content-between align-items-center mb-1">
-                    <span>{{ s.label }}</span>
-                    <span class="badge bg-secondary">{{ s.count }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        <style>
+            .quick-stats {
+                display: grid;
+                gap: 12px;
+            }
+            .quick-total {
+                padding: 14px 16px;
+                border-radius: var(--radius-lg);
+                background: linear-gradient(135deg, #e3efff 0%, #f7f9ff 100%);
+                border: 1px solid var(--sidebar-border);
+                box-shadow: var(--shadow-soft);
+            }
+            .quick-total__label {
+                font-size: 12px;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: #5b6475;
+                margin-bottom: 4px;
+            }
+            .quick-total__value {
+                font-size: 28px;
+                font-weight: 700;
+                color: #0f172a;
+            }
+            .quick-status-list {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .quick-status {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 12px;
+                border-radius: var(--radius-lg);
+                border: 1px solid var(--sidebar-border);
+                background: #ffffff;
+                box-shadow: var(--shadow-soft);
+            }
+            .quick-status__label {
+                font-weight: 600;
+                color: #0f172a;
+            }
+            .quick-status__badge {
+                min-width: 36px;
+                height: 26px;
+                border-radius: 999px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 13px;
+            }
+            .quick-status--primary .quick-status__badge {
+                background: var(--accent-soft);
+                color: var(--accent);
+            }
+            .quick-status--warning .quick-status__badge {
+                background: #fff4e5;
+                color: #b45309;
+            }
+            .quick-status--success .quick-status__badge {
+                background: #e6f7ed;
+                color: #17803d;
+            }
+            .quick-status--secondary .quick-status__badge {
+                background: #e5e7eb;
+                color: #374151;
+            }
+            :root[data-theme='dark'] .quick-total {
+                background: linear-gradient(135deg, #11131b 0%, #141623 100%);
+                border-color: var(--border-subtle);
+            }
+            :root[data-theme='dark'] .quick-total__label {
+                color: #9ca3af;
+            }
+            :root[data-theme='dark'] .quick-total__value {
+                color: #f9fafb;
+            }
+            :root[data-theme='dark'] .quick-status {
+                background: var(--content-bg);
+                border-color: var(--border-subtle);
+                box-shadow: none;
+            }
+            :root[data-theme='dark'] .quick-status__label {
+                color: #e5e7eb;
+            }
+            :root[data-theme='dark'] .quick-status--warning .quick-status__badge {
+                background: #3a2f16;
+                color: #f7c266;
+            }
+            :root[data-theme='dark'] .quick-status--success .quick-status__badge {
+                background: #13301f;
+                color: #7be0a0;
+            }
+            :root[data-theme='dark'] .quick-status--primary .quick-status__badge {
+                background: #1e2c44;
+                color: #9bc5ff;
+            }
+        </style>
+
+        <div class="quick-stats">
+            <div class="quick-total">
+                <div class="quick-total__label">&#321;&#261;cznie zg&#322;osze&#324;</div>
+                <div class="quick-total__value">{{ total_count }}</div>
+            </div>
+
+            <div class="quick-status-list">
+                {% for s in status_cards %}
+                    <div class="quick-status quick-status--{{ s.color|default:'secondary' }}">
+                        <span class="quick-status__label">{{ s.label }}</span>
+                        <span class="quick-status__badge">{{ s.count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock %}
+

@@ -59,14 +59,15 @@ class DashboardView(LoginRequiredMixin, View):
             zgloszenia_qs = Zgloszenie.objects.filter(zgloszone_przez=user)
 
         # === 2. STATYSTYKI (PRZENIESIONE TUTAJ) ===
-        # Obliczamy statystyki NA BAZIE przefiltrowanej listy (zgloszenia_qs),
-        # a nie wszystkich obiektów w bazie.
+        # Statystyki liczymy tylko dla zgłoszeń zalogowanego użytkownika.
 
-        # Całkowita liczba zgłoszeń (dla tego użytkownika)
-        total_count = zgloszenia_qs.count()
+        stats_qs = Zgloszenie.objects.filter(zgloszone_przez=user)
 
-        # Zliczanie po statusach
-        status_counts = zgloszenia_qs.values("status").annotate(count=Count("pk"))
+        # Całkowita liczba zgłoszeń zalogowanego użytkownika
+        total_count = stats_qs.count()
+
+        # Zliczanie po statusach dla zalogowanego użytkownika
+        status_counts = stats_qs.values("status").annotate(count=Count("pk"))
         count_map = {row["status"]: row["count"] for row in status_counts}
 
         # Definicja kafelków
