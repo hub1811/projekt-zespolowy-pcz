@@ -1,169 +1,162 @@
-<!doctype html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>HELPDESK – Dashboard</title>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-</head>
+{% extends "base.html" %}
 
-<body class="bg-light py-5">
+{% block title %}Dashboard{% endblock %}
 
-<div class="container">
+{% block content %}
 
-    <h1 class="text-center mb-4">HELPDESK</h1>
-
-    <!-- GÓRNE PRZYCISKI -->
-    <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
-        <a href="{% url 'password_change' %}" class="btn btn-primary me-2">Zmień hasło</a>
-        <a href="{% url 'helpdesk:zgloszenie_nowe' %}" class="btn btn-success">Nowe zgłoszenie</a>
-        {% if is_manager or user.is_superuser %}
-            <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Panel Admina</a>
-        {% endif %}
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-danger btn-sm">Wyloguj</button>
-        </form>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+    <div>
+        <h2 class="fw-bold text-dark mb-0">Panel Główny</h2>
+        <p class="text-muted mb-0">Przegląd zgłoszeń i statystyk</p>
     </div>
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+        {% if is_manager or user.is_superuser %}
+            <a href="{% url 'admin:index' %}" class="btn btn-dark shadow-sm">
+                <i class="bi bi-gear-fill me-1"></i> Admin
+            </a>
+        {% endif %}
+        <a href="{% url 'helpdesk:zgloszenie_nowe' %}" class="btn btn-primary shadow-sm px-4">
+            <i class="bi bi-plus-lg me-1"></i> Nowe Zgłoszenie
+        </a>
+    </div>
+</div>
 
-    <!-- KAFELKI ZE STATYSTYKAMI STATUSÓW -->
-<div class="row row-cols-4 g-3 mb-4">
-    <!-- wszystkie zgłoszenia -->
-    <div class="col">
-        <div class="card text-center shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="text-muted mb-1">Wszystkie zgłoszenia</h6>
-                <h3 class="mb-0">{{ total_count }}</h3>
+<div class="row g-3 mb-5">
+    <div class="col-md-3">
+        <div class="card h-100 border-start border-4 border-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-uppercase text-muted small fw-bold">Wszystkie</div>
+                        <div class="fs-2 fw-bold text-dark">{{ total_count }}</div>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                        <i class="bi bi-folder2-open fs-4"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 3 statusy: NOWE, W toku, Zakończone -->
     {% for s in status_cards %}
-        <div class="col">
-            <div class="card text-center shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <h6 class="text-muted mb-1">{{ s.label }}</h6>
-                    <h3 class="mb-0">{{ s.count }}</h3>
+        <div class="col-md-3">
+            <div class="card h-100 border-start border-4 border-{{ s.color|default:'secondary' }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-uppercase text-muted small fw-bold">{{ s.label }}</div>
+                            <div class="fs-2 fw-bold text-dark">{{ s.count }}</div>
+                        </div>
+                        <div class="bg-{{ s.color|default:'secondary' }} bg-opacity-10 text-{{ s.color|default:'secondary' }} p-3 rounded-circle">
+                            {% if s.color == 'primary' %}<i class="bi bi-star"></i>{% endif %}
+                            {% if s.color == 'warning' %}<i class="bi bi-hourglass-split"></i>{% endif %}
+                            {% if s.color == 'success' %}<i class="bi bi-check-lg"></i>{% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     {% endfor %}
 </div>
 
-
-
-    <!-- FILTRY -->
-    <form method="get" class="card mb-4 shadow-sm">
-        <div class="card-body d-flex justify-content-center align-items-end gap-3 flex-wrap">
-
-            <!-- FILTR STATUSU -->
-            <div class="col-md-4">
-                <label class="form-label mb-1">Status</label>
-                <select name="status" class="form-select">
-    <option value="">Wszystkie</option>
-
-    <option value="NOWE"
-            {% if status_filter == "NOWE" %}selected{% endif %}>
-        NOWE
-    </option>
-
-    <option value="W_TOKU"
-            {% if status_filter == "W_TOKU" %}selected{% endif %}>
-        W toku
-    </option>
-
-    <option value="ROZWIAZANE"
-            {% if status_filter == "Rozwiazane" %}selected{% endif %}>
-        Rozwiazane
-    </option>
-</select>
-
+<div class="row">
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold text-uppercase small py-3">
+                <i class="bi bi-sliders me-2"></i>Filtrowanie
             </div>
-
-            <!-- FILTR KATEGORII -->
-<div class="col-md-4">
-    <label class="form-label mb-1">Kategoria</label>
-    <select name="kategoria" class="form-select">
-        <option value="">Wszystkie</option>
-
-        <option value="1"
-                {% if kategoria_filter|stringformat:'s' == "1" %}selected{% endif %}>
-            Infrastruktura sieciowa
-        </option>
-
-        <option value="2"
-                {% if kategoria_filter|stringformat:'s' == "2" %}selected{% endif %}>
-            Oprogramowanie
-        </option>
-
-        <option value="3"
-                {% if kategoria_filter|stringformat:'s' == "3" %}selected{% endif %}>
-            Sprzęt komputerowy
-        </option>
-    </select>
-</div>
-
-
-            <!-- PRZYCISKI -->
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-outline-primary w-100">Filtruj</button>
+            <div class="card-body bg-light">
+                <form method="get">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Status</label>
+                        <select name="status" class="form-select border-0 shadow-sm">
+                            <option value="">Wszystkie</option>
+                            <option value="NOWE" {% if status_filter == "NOWE" %}selected{% endif %}>Nowe</option>
+                            <option value="W_TOKU" {% if status_filter == "W_TOKU" %}selected{% endif %}>W toku</option>
+                            <option value="Rozwiazane" {% if status_filter == "Rozwiazane" %}selected{% endif %}>Rozwiązane</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Kategoria</label>
+                        <select name="kategoria" class="form-select border-0 shadow-sm">
+                            <option value="">Wszystkie</option>
+                            <option value="1" {% if kategoria_filter|stringformat:'s' == "1" %}selected{% endif %}>Infrastruktura</option>
+                            <option value="2" {% if kategoria_filter|stringformat:'s' == "2" %}selected{% endif %}>Oprogramowanie</option>
+                            <option value="3" {% if kategoria_filter|stringformat:'s' == "3" %}selected{% endif %}>Sprzęt</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm">Zastosuj</button>
+                        <a href="{% url 'helpdesk:dashboard' %}" class="btn btn-outline-secondary btn-sm">Wyczyść</a>
+                    </div>
+                </form>
             </div>
-        </div>
-    </form>
-
-    <!-- TABELA ZGŁOSZEŃ -->
-    <h2 class="mb-3">Lista zgłoszeń</h2>
-
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-striped mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tytuł</th>
-                        <th>Kategoria zgłoszenia</th>
-                        <th>Status</th>
-                        <th>Priorytet</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for z in zgloszenia %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'helpdesk:zgloszenie_detail' z.pk %}">
-                                #{{ z.id }}
-                            </a>
-                        </td>
-                        <td>{{ z.tytul }}</td>
-                        <td>{{ z.kategoria }}</td>  {# u Ciebie to już wypisuje pełną nazwę #}
-                        {# jeśli kiedyś zmienisz na choices, można użyć {{ z.get_kategoria_display }} #}
-<td>
-    {% if z.status == "W_TOKU" %}
-        W toku
-    {% elif z.status == "ROZWIAZANE" %}
-        Rozwiazane
-    {% else %}
-        {{ z.status|title }}
-    {% endif %}
-</td>
-                        <td>{{ z.priorytet }}</td>
-                        <td>{{ z.data_utworzenia }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-3">
-                            Brak zgłoszeń spełniających kryteria.
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
 
+    <div class="col-lg-9">
+        <div class="card shadow-sm overflow-hidden">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-dark">Ostatnie zgłoszenia</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Temat</th>
+                            <th>Kategoria</th>
+                            <th>Status</th>
+                            <th>Priorytet</th>
+                            <th>Data</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for z in zgloszenia %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ z.tytul }}</div>
+                                <div class="small text-muted">#{{ z.id }} • {{ z.zgloszone_przez.username }}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border fw-normal">{{ z.kategoria }}</span></td>
+                            <td>
+                                {% if z.status == 'NOWE' %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">Nowe</span>
+                                {% elif z.status == 'W_TOKU' %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1">W toku</span>
+                                {% elif z.status == 'Rozwiazane' or z.status == 'ROZWIAZANE' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success px-2 py-1">Rozwiązane</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ z.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if z.priorytet == 'WYSOKI' %}
+                                    <span class="text-danger small fw-bold"><i class="bi bi-arrow-up"></i> Wysoki</span>
+                                {% else %}
+                                    <span class="text-muted small">{{ z.priorytet|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ z.data_utworzenia|date:"d.m.Y" }}</td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'helpdesk:zgloszenie_detail' z.pk %}" class="btn btn-sm btn-light text-primary fw-bold">
+                                    Podgląd
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="text-muted mb-2"><i class="bi bi-inbox fs-1"></i></div>
+                                <span class="text-muted">Brak zgłoszeń do wyświetlenia</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-</body>
-</html>
+{% endblock %}
