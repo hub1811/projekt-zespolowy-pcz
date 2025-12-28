@@ -3,6 +3,7 @@ venv/
 .venv/
 env/
 .idea/
+*.sqlite3
 
 # Ignoruj pliki skompilowane
 __pycache__/
