@@ -1,0 +1,12 @@
+# Ignoruj środowisko wirtualne Pythona
+venv/
+.venv/
+env/
+
+# Ignoruj pliki skompilowane
+__pycache__/
+*.pyc
+
+# Ignoruj pliki systemowe i logi
+.DS_Store
+*.log
