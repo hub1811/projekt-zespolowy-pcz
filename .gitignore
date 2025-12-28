@@ -2,6 +2,7 @@
 venv/
 .venv/
 env/
+.idea/
 
 # Ignoruj pliki skompilowane
 __pycache__/
